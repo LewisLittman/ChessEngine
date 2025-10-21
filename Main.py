@@ -23,7 +23,7 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = GameState()
-    validMoves = gs.get_all_possible_moves()
+    validMoves = gs.get_all_valid_moves()
     moveMade = False
     images = load_images()
     selected = ()
@@ -60,7 +60,7 @@ def main():
                     moveMade = True
 
         if moveMade:
-            validMoves = gs.get_all_possible_moves()
+            validMoves = gs.get_all_valid_moves()
             moveMade = False
         
         draw_game_state(screen, gs, images)
