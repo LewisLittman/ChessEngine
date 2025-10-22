@@ -28,6 +28,7 @@ def main():
     images = load_images()
     selected = ()
     selectedSquares = []
+    promotion = False
 
     running = True
     while running:
@@ -46,10 +47,16 @@ def main():
                     selectedSquares.append(selected)
                 if len(selectedSquares) == 2:   
                     move = Move(selectedSquares[0], selectedSquares[1], gs.board)
-                    # print(move.get_chess_notation())
-                    if move in validMoves:
-                        gs.make_move(move)
-                        moveMade = True
+                    print(move.get_chess_notation())
+                    for validMove in validMoves:
+                        if move == validMove:
+                            gs.make_move(validMove)
+                            moveMade = True
+                            if validMove.pieceMoved[1] == 'P' and (validMove.endRow == 0 or validMove.endRow == 7):
+                                promotion = True
+                                promotionPiece = ask_promotion(screen, validMove.pieceMoved[0])
+                                gs.make_promotion(validMove, promotionPiece)
+                            break
                     selected = ()
                     selectedSquares = []
             elif e.type == p.KEYDOWN:
@@ -85,6 +92,51 @@ def draw_pieces(screen, board, images):
             if piece != "--":
                 screen.blit(images[piece], p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE * 0.8, SQ_SIZE * 0.8))
 
+def ask_promotion(screen, color):
+    font = p.font.SysFont("Arial", 24)
+    width, height = screen.get_size()
+    overlay = p.Surface((width, height))
+    overlay.set_alpha(200)
+    overlay.fill((50, 50, 50))
+
+    screen.blit(overlay, (0, 0))
+    text = font.render("Promote to:", True, (255, 255, 255))
+    screen.blit(text, (width//2 - text.get_width()//2, HEIGHT // 2 - 2 * SQ_SIZE // 2))
+
+    # Load piece images or text labels
+    pieces = ['Q', 'R', 'B', 'N']
+    labels = ['Queen', 'Rook', 'Bishop', 'Knight']
+
+    buttons = []
+    button_width = 100
+    button_height = 60
+    margin = 20
+    total_width = len(pieces) * (button_width + margin) - margin
+    start_x = (width - total_width) // 2
+    y = HEIGHT // 2 - SQ_SIZE // 2
+
+    for i, label in enumerate(labels):
+        rect = p.Rect(start_x + i*(button_width + margin), y, button_width, button_height)
+        p.draw.rect(screen, (200, 200, 200), rect)
+        txt = font.render(label, True, (0, 0, 0))
+        screen.blit(txt, (rect.centerx - txt.get_width()//2, rect.centery - txt.get_height()//2))
+        buttons.append((rect, pieces[i]))
+
+    p.display.flip()
+
+    # Wait for click
+    while True:
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                p.quit()
+                quit()
+            if event.type == p.MOUSEBUTTONDOWN:
+                pos = p.mouse.get_pos()
+                for rect, piece_code in buttons:
+                    if rect.collidepoint(pos):
+                        return piece_code
+
 
 if __name__ == "__main__":
     main()
+
