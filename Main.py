@@ -65,17 +65,37 @@ def main():
                     selected = ()
                     selectedSquares = []
                     moveMade = True
+                    gs.checkMate = False
+                    gs.staleMate = False
 
         if moveMade:
             validMoves = gs.get_all_valid_moves()
             moveMade = False
         
-        draw_game_state(screen, gs, images)
+        draw_game_state(screen, gs, images, validMoves, selected)
+
+        if gs.checkMate:
+            game_over(screen, "Checkmate: " + ("Black" if gs.whiteToMove else "White") + " wins!")
+        elif gs.staleMate:
+            game_over(screen, "Stalemate: Draw!")
+        
         clock.tick(MAX_FPS)
         p.display.flip()
 
-def draw_game_state(screen, gs, images):
+def game_over(screen, text):
+    font = p.font.SysFont("Arial", 32)
+    width, height = screen.get_size()
+    overlay = p.Surface((width, height))
+    overlay.set_alpha(200)
+    overlay.fill((50, 50, 50))
+
+    screen.blit(overlay, (0, 0))
+    text_surface = font.render(text, True, (255, 255, 255))
+    screen.blit(text_surface, (width//2 - text_surface.get_width()//2, height//2 - text_surface.get_height()//2))
+
+def draw_game_state(screen, gs, images, validMoves, selectedSquare):
     draw_board(screen)
+    square_highlight(screen, gs, validMoves, selectedSquare)
     draw_pieces(screen, gs.board, images)
 
 def draw_board(screen):
@@ -85,6 +105,19 @@ def draw_board(screen):
             color = colors[((r + c) % 2)]
             p.draw.rect(screen, color, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
     
+def square_highlight(screen, gs, validMoves, selectedSquare):
+    if selectedSquare != ():
+        r, c = selectedSquare
+        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'):
+            s = p.Surface((SQ_SIZE, SQ_SIZE))
+            s.set_alpha(100)
+            s.fill(p.Color('darkorchid'))
+            screen.blit(s, (c * SQ_SIZE, r * SQ_SIZE))
+            s.fill(p.Color('goldenrod1'))
+            for move in validMoves:
+                if move.startRow == r and move.startCol == c:
+                    screen.blit(s, (move.endCol * SQ_SIZE, move.endRow * SQ_SIZE))
+
 def draw_pieces(screen, board, images):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
@@ -135,7 +168,6 @@ def ask_promotion(screen, color):
                 for rect, piece_code in buttons:
                     if rect.collidepoint(pos):
                         return piece_code
-
 
 if __name__ == "__main__":
     main()

@@ -27,6 +27,8 @@ class GameState:
         self.currentCastlingRights = CastleRights(True, True, True, True)
         self.castleRightsLog = [CastleRights(self.currentCastlingRights.wks, self.currentCastlingRights.bks,
                                              self.currentCastlingRights.wqs, self.currentCastlingRights.bqs)]
+        self.checkMate = False
+        self.staleMate = False                                             
 
     def make_promotion(self, move, promotionPiece):
         self.board[move.endRow][move.endCol] = move.pieceMoved[0] + promotionPiece
@@ -158,6 +160,12 @@ class GameState:
                 self.get_king_moves(kingRow, kingCol, moves)
         else:
             moves = self.get_all_possible_moves()
+
+        if len(moves) == 0:
+            if self.inCheck:
+                self.checkMate = True
+            else:
+                self.staleMate = True
 
         return moves
 
