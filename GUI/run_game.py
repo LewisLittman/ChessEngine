@@ -1,9 +1,12 @@
-# GUI/game_screen.py - displays the game board and handles user input during the game
+# GUI/run_game.py - displays the game board and handles user input during the game
+# starts a game with given players (None for human) or AI engine objects
+# local play handled within this file
 
 import pygame as p
 from config.settings import game_info
 from game.game_engine import GameState, Move
 from game.utils import load_images, draw_board, draw_pieces, square_highlight, draw_game_state, game_over, ask_promotion
+
 
 def start_game(player_white=None, player_black=None, game_info=None):
     # starts a chess game with given players (None for human) or a given AI /
@@ -60,9 +63,10 @@ def start_game(player_white=None, player_black=None, game_info=None):
                     gs.staleMate = False
         
         if not human_turn and not gs.checkMate and not gs.staleMate:
-            # AI move logic would go here
-            pass
-
+            engine = player_white if gs.whiteToMove else player_black
+            move = engine.select_move(validMoves, gs)
+            gs.make_move(move)
+            moveMade = True
 
         if moveMade:
             validMoves = gs.get_all_valid_moves()

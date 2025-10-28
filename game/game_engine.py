@@ -1,5 +1,4 @@
-# GameEngine.py 
-# This module defines the GameState class which manages the state of a chess game.
+# game/game_engine.py - handles core game logic and updates the game state
 
 class GameState:
     def __init__(self):
