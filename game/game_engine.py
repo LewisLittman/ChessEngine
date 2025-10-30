@@ -372,7 +372,6 @@ class GameState:
                             break
                 else:
                     break
-
         
 
     def get_queen_moves(self, r, c, moves):
@@ -421,10 +420,6 @@ class GameState:
                 moves.append(Move((r, c), (r, c-2), self.board, isCastleMove=True))
     
     def square_under_attack(self, r, c):
-        """
-        Returns True if the square (r, c) is attacked by an enemy piece.
-        This function directly checks attacks without generating all moves.
-        """
         enemyColor = "b" if self.whiteToMove else "w"
         allyColor = "w" if self.whiteToMove else "b"
 
@@ -475,9 +470,9 @@ class GameState:
 
         # Check for pawn attacks
         if self.whiteToMove:
-            pawnDirs = [(-1, -1), (-1, 1)]  # enemy pawns are black
+            pawnDirs = [(-1, -1), (-1, 1)]  # enemy pawns are black - attack downwards
         else:
-            pawnDirs = [(1, -1), (1, 1)]    # enemy pawns are white
+            pawnDirs = [(1, -1), (1, 1)]    # enemy pawns are white - attack upwards
         for d in pawnDirs:
             endRow = r + d[0]
             endCol = c + d[1]

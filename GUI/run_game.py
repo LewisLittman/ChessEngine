@@ -3,6 +3,7 @@
 # local play handled within this file
 
 import pygame as p
+import random
 from config.settings import game_info
 from game.game_engine import GameState, Move
 from game.utils import load_images, draw_board, draw_pieces, square_highlight, draw_game_state, game_over, ask_promotion
@@ -67,6 +68,12 @@ def start_game(player_white=None, player_black=None, game_info=None):
             move = engine.select_move(validMoves, gs)
             gs.make_move(move)
             moveMade = True
+
+            # handle random pawn promotion for random engine
+            if move.pieceMoved[1] == 'P' and (move.endRow == 0 or move.endRow == 7):
+                promotion = True
+                promotionPiece = random.choice(['Q', 'R', 'B', 'N'])
+                gs.make_promotion(move, promotionPiece)
 
         if moveMade:
             validMoves = gs.get_all_valid_moves()
